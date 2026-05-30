@@ -3,6 +3,7 @@ package com.example.user_microservice.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.user_microservice.dto.PaymentDTO;
 import com.example.user_microservice.dto.PaymentResponseDTO;
-import com.example.user_microservice.entity.Payment;
 import com.example.user_microservice.service.IPaymentService;
 
 
@@ -36,8 +36,8 @@ public class PaymentController {
 	}
 	
 	@GetMapping(value="/getpaymentbyid/{pid}")
-	public PaymentResponseDTO getPaymentById(@PathVariable int id) {
-		return service.getPaymentById(id);
+	public PaymentResponseDTO getPaymentById(@PathVariable int pid) {
+		return service.getPaymentById(pid);
 	}
 	
 	@GetMapping(value="/getallpayments")
@@ -53,6 +53,13 @@ public class PaymentController {
 	@GetMapping(value="/getpaymentbyorderid/{oid}")
 	public PaymentResponseDTO getPaymentGt(@PathVariable int oid) {
 		return service.getPaymentByOrderId(oid);
+	}
+	
+	@DeleteMapping(value="/deletepaymentbyid/{pid}")
+	public String deletePaymentById(@PathVariable int pid) {
+		PaymentResponseDTO pay=service.getPaymentById(pid);
+		service.deletePaymentById(pid);
+		return "Payment Record Deleted Successfully";
 	}
 	
 	

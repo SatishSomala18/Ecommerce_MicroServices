@@ -45,13 +45,9 @@ public class ProductController {
 
 	@DeleteMapping(value = "/deletebyid/{pid}")
 	public String deleteProductById(@PathVariable int pid) {
-		service.deleteById(pid);
-		String res = "";
 		Product p = service.getProductById(pid);
-		if (p == null) {
-			res = "Product Record Deleted Successfully";
-		}
-		return res;
+		service.deleteById(pid);
+		return "Product Record Deleted Successfully";
 	}
 
 	@GetMapping(value = "/getbypricegt/{price}")

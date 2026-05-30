@@ -12,6 +12,8 @@ import com.example.user_microservice.dto.PaymentDTO;
 import com.example.user_microservice.dto.PaymentResponseDTO;
 import com.example.user_microservice.entity.Payment;
 import com.example.user_microservice.entity.User;
+import com.example.user_microservice.exceptions.PaymentNotFoundException;
+import com.example.user_microservice.exceptions.UserNotFoundException;
 import com.example.user_microservice.repository.PaymentRepository;
 import com.example.user_microservice.repository.UserRepository;
 
@@ -36,6 +38,8 @@ public class PaymentServiceImp implements IPaymentService {
 		OrderResponseDTO order = rt.getForObject(url, OrderResponseDTO.class);
 
 		User user = userrepository.findById(order.getUserId()).orElse(null);
+		
+		if(user==null) throw new UserNotFoundException("User Not Found With ID :"+order.getUserId());
 
 		payment.setUser(user);
 
@@ -47,12 +51,18 @@ public class PaymentServiceImp implements IPaymentService {
 	@Override
 	public PaymentResponseDTO updatePayment(PaymentDTO p, int pid) {
 		Payment payment = convertToPayment(p);
+		
+		PaymentResponseDTO pment=getPaymentById(pid);
 		payment.setId(pid);
 		String url = "http://localhost:8080/orders/getorderbyid/" + payment.getOrderId();
 
 		OrderResponseDTO order = rt.getForObject(url, OrderResponseDTO.class);
 
 		User user = userrepository.findById(order.getUserId()).orElse(null);
+		
+		if(user==null) throw new UserNotFoundException("User Not Found With ID :"+order.getUserId());
+		
+		
 
 		payment.setUser(user);
 
@@ -65,7 +75,9 @@ public class PaymentServiceImp implements IPaymentService {
 
 	@Override
 	public PaymentResponseDTO getPaymentById(int id) {
-		return convertToDTO(repo.findById(id).orElse(null));
+		Payment pay=repo.findById(id).orElse(null);
+		if(pay==null) throw new PaymentNotFoundException("Payment Not Found With  ID :"+id);
+		return convertToDTO(pay);
 	}
 
 	@Override
@@ -95,7 +107,10 @@ public class PaymentServiceImp implements IPaymentService {
 
 	@Override
 	public PaymentResponseDTO getPaymentByOrderId(int id) {
-		return convertToDTO(repo.findByOrderId(id));
+		
+		Payment pay=repo.findByOrderId(id);
+		if(pay==null) throw new PaymentNotFoundException("Payment Not Found With Order ID :"+id);
+		return convertToDTO(pay);
 	}
 
 	public PaymentResponseDTO convertToDTO(Payment p) {

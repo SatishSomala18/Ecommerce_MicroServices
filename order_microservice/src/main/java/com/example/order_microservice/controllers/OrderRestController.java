@@ -27,6 +27,11 @@ public class OrderRestController {
 	public OrderResponseDTO updateOrder(@PathVariable boolean status, @PathVariable int oid) {
 		return service.updateOrderStatus(oid, status);
 	}
+	
+	@PutMapping(value = "/updateOrder/{oid}")
+	public OrderResponseDTO updateOrder(@RequestBody OrderDTO ord, @PathVariable int oid) {
+		return service.updateOrder(ord,oid);
+	}
 
 	@PostMapping(value = "/addorder")
 	public OrderResponseDTO addOrder(@RequestBody OrderDTO ord) {
@@ -57,6 +62,11 @@ public class OrderRestController {
 	@GetMapping(value = "/getorderbystatus/{status}")
 	public List<OrderResponseDTO> getOrdersByStatus(@PathVariable boolean status) {
 		return service.getOrdersByStatus(status);
+	}
+	
+	@GetMapping(value = "/getorderbyuserid/{uid}")
+	public List<OrderResponseDTO> getOrdersByUserId(@PathVariable int uid) {
+		return service.getOrdersByUserId(uid);
 	}
 
 }

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.example.user_microservice.dto.UserDTO;
 import com.example.user_microservice.dto.UserResponseDTO;
 import com.example.user_microservice.entity.User;
+import com.example.user_microservice.exceptions.UserNotFoundException;
+import com.example.user_microservice.exceptions.WrongPasswordException;
 import com.example.user_microservice.repository.UserRepository;
 
 
@@ -30,18 +32,19 @@ public class UserServiceImp implements IUserService{
 		User user=convertToUser(u);
 		user.setId(uid);
 		User user2=repo.findById(uid).orElse(null);
+		if(user2==null) throw new UserNotFoundException("User Not Found With ID :"+uid);
 		if(user2.getPassword().equals(user.getPassword())) {
 			return convertToDTO(repo.save(user));
 		}
 		
-		return null;
+		throw new WrongPasswordException("Password is Wrong...!!!!  Please Enter Valid Password");
 		
 	}
 
 	@Override
 	public UserResponseDTO getUserById(int id) {
 		User u=repo.findById(id).orElse(null);
-		if(u==null) return null;
+		if(u==null) throw new UserNotFoundException("User Not Found With ID :"+id);
 		return convertToDTO(u);
 	}
 
@@ -64,7 +67,10 @@ public class UserServiceImp implements IUserService{
 
 	@Override
 	public UserResponseDTO	  getUserByName(String name) {
-		return convertToDTO(repo.findByName(name));
+		
+		User user=repo.findByName(name);
+		if(user==null) throw new UserNotFoundException("User Not Found With Name :"+name);
+		return convertToDTO(user);
 		
 	}
 	

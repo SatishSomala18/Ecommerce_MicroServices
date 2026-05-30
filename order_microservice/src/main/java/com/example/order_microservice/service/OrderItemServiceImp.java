@@ -12,6 +12,8 @@ import com.example.order_microservice.dto.OrderItemResponseDTO;
 import com.example.order_microservice.dto.ProductDTO;
 import com.example.order_microservice.entity.Order;
 import com.example.order_microservice.entity.OrderItem;
+import com.example.order_microservice.exceptions.OrderItemNotFoundException;
+import com.example.order_microservice.exceptions.OrderNotFoundException;
 import com.example.order_microservice.repository.OrderItemRepository;
 import com.example.order_microservice.repository.OrderRepository;
 
@@ -32,6 +34,7 @@ public class OrderItemServiceImp implements IOrderItemService {
 		OrderItem item = new OrderItem();
 
 		Order ord = repo1.findById(dtitem.getOrderId()).orElse(null);
+		if(ord==null) throw new OrderNotFoundException("Order Not Found With ID :"+dtitem.getOrderId());
 
 		item.setProductId(dtitem.getProductId());
 		item.setQuantity(dtitem.getQuantity());
@@ -60,9 +63,13 @@ public class OrderItemServiceImp implements IOrderItemService {
 
 	@Override
 	public OrderItemResponseDTO updateOrderItem(OrderItemDTO dtitem, int itemId) {
+		
+		OrderItemResponseDTO orderitem=getOrderItemById(itemId);
+		
 		OrderItem item = new OrderItem();
 
 		Order ord = repo1.findById(dtitem.getOrderId()).orElse(null);
+		if(ord==null) throw new OrderNotFoundException("Order Not Found With ID :"+dtitem.getOrderId());
 
 		item.setProductId(dtitem.getProductId());
 		item.setQuantity(dtitem.getQuantity());
@@ -94,15 +101,19 @@ public class OrderItemServiceImp implements IOrderItemService {
 	@Override
 	public OrderItemResponseDTO getOrderItemById(int id) {
 		OrderItem ord1 = repo.findById(id).orElse(null);
+		if(ord1==null) throw new OrderItemNotFoundException("Order Item Not Found With ID :"+id);
 
 		return convertToDTO(ord1);
 	}
 
 	@Override
 	public void deleteOrderItemById(int id) {
-		repo.deleteById(id);
 
 		OrderItem ord1 = repo.findById(id).orElse(null);
+		if(ord1==null) throw new OrderItemNotFoundException("Order Item Not Found With ID :"+id);
+		
+		
+		repo.deleteById(id);
 
 		Order or = ord1.getOrder();
 		updateTotalPrice(or.getId());

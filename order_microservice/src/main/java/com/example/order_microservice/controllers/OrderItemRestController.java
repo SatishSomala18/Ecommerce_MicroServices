@@ -41,12 +41,7 @@ public class OrderItemRestController {
 	@DeleteMapping(value = "/deleteorderitembyid/{oid}")
 	public String deleteOrderItemById(@PathVariable int oid) {
 		service.deleteOrderItemById(oid);
-		String res = "";
-		OrderItemResponseDTO item = service.getOrderItemById(oid);
-		if (item == null) {
-			res = "OrderItem Record Deleted Successfully";
-		}
-		return res;
+		return "OrderItem Record Deleted Successfully";
 	}
 
 	@GetMapping(value = "/getallorderitems")

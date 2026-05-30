@@ -13,7 +13,11 @@ import com.example.order_microservice.entity.Order;
 public interface OrderRepository extends JpaRepository<Order,Integer>{
 	
 	
-	public List<Order> getOrdersByStatus(boolean status);
+	public List<Order> findByStatus(boolean status);
+	
+	public List<Order> findByUserId(int oid);
+	
+	
 	
 	@Modifying
 	@Query("update Order o set o.status = ?1  where o.Id = ?2 ")

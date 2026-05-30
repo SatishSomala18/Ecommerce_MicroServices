@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.product_microservice.dto.ProductDTO;
 import com.example.product_microservice.entity.Product;
+import com.example.product_microservice.exceptions.ProductNotFoundException;
 import com.example.product_microservice.repository.ProductRepository;
 
 @Service
@@ -26,13 +27,21 @@ public class ProductServiceImp implements IProductService {
 	@Override
 	public Product updateProduct(Product p) {
 
+		Product pro = repo.findById(p.getId()).orElse(null);
+		if (pro == null) {
+			throw new ProductNotFoundException("Product Not Found With ID :" + p.getId());
+		}
 		return repo.save(p);
 
 	}
 
 	@Override
 	public Product getProductById(int id) {
-		return repo.findById(id).orElse(null);
+		Product pro = repo.findById(id).orElse(null);
+		if (pro == null) {
+			throw new ProductNotFoundException("Product Not Found With ID :" + id);
+		}
+		return pro;
 
 	}
 
@@ -50,12 +59,14 @@ public class ProductServiceImp implements IProductService {
 
 	@Override
 	public List<Product> getAllProdcutsByPriceGT(double price) {
+
 		return repo.findByPriceGreaterThan(price);
 
 	}
 
 	@Override
 	public List<Product> getProductsByPriceRange(double p1, double p2) {
+
 		return repo.getProductsByPriceRange(p1, p2);
 
 	}

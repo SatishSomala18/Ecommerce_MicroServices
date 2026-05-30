@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.order_microservice.dto.OrderDTO;
 import com.example.order_microservice.dto.OrderResponseDTO;
 import com.example.order_microservice.entity.Order;
+import com.example.order_microservice.exceptions.OrderNotFoundException;
 import com.example.order_microservice.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
@@ -36,10 +37,29 @@ public class OrderServiceImp implements IOrderService {
 
 		return convertToDTO(or);
 	}
+	
+	@Override
+	public OrderResponseDTO updateOrder(OrderDTO ord,int oid) {
+
+		Order or = new Order();
+		or.setId(oid);
+		or.setUserId(ord.getUserId());
+		or.setTotalAmount(0);
+		or.setStatus(true);
+		
+		OrderResponseDTO order=getOrderById(oid);
+		
+		or = repo.save(or);
+
+		return convertToDTO(or);
+	}
+	
+	
 
 	@Override
 	public OrderResponseDTO updateOrderStatus(int oid, boolean status) {
 
+		OrderResponseDTO order=getOrderById(oid);
 		repo.updateOrderStatus(status, oid);
 		Order or = repo.findById(oid).orElse(null);
 		return convertToDTO(or);
@@ -48,6 +68,7 @@ public class OrderServiceImp implements IOrderService {
 	@Override
 	public OrderResponseDTO getOrderById(int id) {
 		Order or = repo.findById(id).orElse(null);
+		if(or==null) throw new OrderNotFoundException("Order Not Found With ID : "+id);
 
 		return convertToDTO(or);
 	}
@@ -72,7 +93,7 @@ public class OrderServiceImp implements IOrderService {
 
 	@Override
 	public List<OrderResponseDTO> getOrdersByStatus(boolean status) {
-		List<Order> list = repo.getOrdersByStatus(status);
+		List<Order> list = repo.findByStatus(status);
 
 		List<OrderResponseDTO> ans = new ArrayList<>();
 		for (Order or : list) {
@@ -91,6 +112,19 @@ public class OrderServiceImp implements IOrderService {
 		response.setId(or.getId());
 		response.setItems(itemrepo.getOrderItemByOrderId(or.getId()));
 		return response;
+	}
+
+	@Override
+	public List<OrderResponseDTO> getOrdersByUserId(int oid) {
+		List<Order> list = repo.findByUserId(oid);
+
+		List<OrderResponseDTO> ans = new ArrayList<>();
+		for (Order or : list) {
+
+			ans.add(convertToDTO(or));
+
+		}
+		return ans;
 	}
 
 }

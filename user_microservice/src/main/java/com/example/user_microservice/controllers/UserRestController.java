@@ -17,51 +17,43 @@ import com.example.user_microservice.dto.UserResponseDTO;
 import com.example.user_microservice.entity.User;
 import com.example.user_microservice.service.IUserService;
 
-
 @RestController
 @RequestMapping("/user")
 public class UserRestController {
-	
+
 	@Autowired
 	IUserService service;
-	
-	
-	
 
-	
-	@PostMapping(value="/add")
+	@PostMapping(value = "/add")
 	public UserResponseDTO addUser(@RequestBody UserDTO u) {
 		return service.addUser(u);
 	}
-	
-	@PutMapping(value="/update")
-	public UserResponseDTO updateUser(@RequestBody UserDTO u,@PathVariable int uid) {
-		return service.updateUser(u,uid);
+
+	@PutMapping(value = "/update/{uid}")
+	public UserResponseDTO updateUser(@RequestBody UserDTO u, @PathVariable int uid) {
+		return service.updateUser(u, uid);
 	}
-	
-	@GetMapping(value="/getuserbyid/{uid}")
+
+	@GetMapping(value = "/getuserbyid/{uid}")
 	public UserResponseDTO getUserById(@PathVariable int uid) {
 		return service.getUserById(uid);
 	}
-	
-	@GetMapping(value="/getusers")
+
+	@GetMapping(value = "/getusers")
 	public List<UserResponseDTO> getAllUser(){
 		return service.getAllUsers();
 	}
-	
-	
-	@DeleteMapping(value="/deleteuser/{uid}")
+
+	@DeleteMapping(value = "/deleteuser/{uid}")
 	public String deleteUserById(@PathVariable int uid) {
-		String res="";
+		UserResponseDTO u = service.getUserById(uid);
+
 		service.deleteUserById(uid);
-		UserResponseDTO u=service.getUserById(uid);
-		if(u==null) {
-			res="User Record Deleted Successfully";
-		}
-		return res;
+
+		return "User Record Deleted Successfully";
 	}
-	
-	@GetMapping(value="/getuserbyname/{uname}")
+
+	@GetMapping(value = "/getuserbyname/{uname}")
 	public UserResponseDTO getUserByName(@PathVariable String uname) {
 		return service.getUserByName(uname);
 	}
